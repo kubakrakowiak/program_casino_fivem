@@ -1,0 +1,49 @@
+body, html {
+	overflow-y: hidden;
+	overflow-x: hidden;
+
+}
+
+.hide {
+	display: none;
+}
+
+.show {
+	display: block;
+}
+
+
+
+a {
+  color: #7A963B;
+  text-decoration: none;
+  overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+a:hover {
+  color: #fff;
+}
+
+#header {
+  width: 800px;
+  margin: auto;
+  overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+canvas {
+	
+	margin: auto;
+	display: block;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+#stage {
+	width: 800px;
+	margin: auto;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
