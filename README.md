@@ -17,6 +17,7 @@ Every money, this witch players win and lose is taking or giving to casino accou
 * >start program-blackjack
 * >start slotmachine_1
 3. Configure files, (section Configurate)
+4. Improt program-casino.sql to database
 
 
 # Configurate
