@@ -11,11 +11,13 @@ Every money, this witch players win and lose is taking or giving to casino accou
 * pNotify
 
 # Installation 
-* Upload [cas] directory to resource directory
-* Add to server.cfg 
+1. Upload [cas] directory to resource directory
+1. Add to server.cfg 
 * >start program-casino
 * >start program-blackjack
 * >start slotmachine_1
+3. Configure files, (section Configurate)
+
 
 # Configurate
 * To edit Casino zones u have to edit config.lua in program-casino
