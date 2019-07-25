@@ -135,7 +135,7 @@ AddEventHandler('program-casino:craftingCoktails', function(itemValue)
             local bethQuantity      = xPlayer.getInventoryItem('whisky').count
 
             if alephQuantity < 2 then
-                TriggerClientEvent('esx:showNotification', _source, "Nie wystarczająco " .. 'woda' .. '~w~')
+                TriggerClientEvent('esx:showNotification', _source, "Nie wystarczająco " .. 'cola' .. '~w~')
             elseif bethQuantity < 2 then
                 TriggerClientEvent('esx:showNotification', _source, "Nie wystarczająco " .. "whisky" .. '~w~')
             else
@@ -531,3 +531,158 @@ ESX.RegisterServerCallback('program-casino:getStockItems', function(source, cb)
     end)
   
   end)
+
+  ESX.RegisterServerCallback('program-casino:addVaultWeapon', function(source, cb, weaponName)
+
+    local _source = source
+    local xPlayer = ESX.GetPlayerFromId(_source)
+  
+    xPlayer.removeWeapon(weaponName)
+  
+    TriggerEvent('esx_datastore:getSharedDataStore', 'society_casino', function(store)
+  
+      local weapons = store.get('weapons')
+  
+      if weapons == nil then
+        weapons = {}
+      end
+  
+      local foundWeapon = false
+  
+      for i=1, #weapons, 1 do
+        if weapons[i].name == weaponName then
+          weapons[i].count = weapons[i].count + 1
+          foundWeapon = true
+        end
+      end
+  
+      if not foundWeapon then
+        table.insert(weapons, {
+          name  = weaponName,
+          count = 1
+        })
+      end
+  
+       store.set('weapons', weapons)
+  
+       cb()
+  
+    end)
+  
+end)
+
+ESX.RegisterServerCallback('program-casino:removeVaultWeapon', function(source, cb, weaponName)
+
+    local _source = source
+    local xPlayer = ESX.GetPlayerFromId(_source)
+  
+    xPlayer.addWeapon(weaponName, 1000)
+  
+    TriggerEvent('esx_datastore:getSharedDataStore', 'society_casino', function(store)
+  
+      local weapons = store.get('weapons')
+  
+      if weapons == nil then
+        weapons = {}
+      end
+  
+      local foundWeapon = false
+  
+      for i=1, #weapons, 1 do
+        if weapons[i].name == weaponName then
+          weapons[i].count = (weapons[i].count > 0 and weapons[i].count - 1 or 0)
+          foundWeapon = true
+        end
+      end
+  
+      if not foundWeapon then
+        table.insert(weapons, {
+          name  = weaponName,
+          count = 0
+        })
+      end
+  
+       store.set('weapons', weapons)
+  
+       cb()
+  
+    end)
+  
+end)
+
+
+ESX.RegisterServerCallback('program-casino:getVaultWeapons', function(source, cb)
+
+    TriggerEvent('esx_datastore:getSharedDataStore', 'society_casino', function(store)
+  
+      local weapons = store.get('weapons')
+  
+      if weapons == nil then
+        weapons = {}
+      end
+  
+      cb(weapons)
+  
+    end)
+  
+end)
+  
+ESX.RegisterServerCallback('program-casino:getPlayerInventory', function(source, cb)
+
+	local _source = source
+	local xPlayer = ESX.GetPlayerFromId(_source)
+	local items      = xPlayer.inventory
+	  
+	cb({
+	  	items      = items
+	})
+	  
+end)
+      
+RegisterServerEvent('program-casino:putStockItems')
+AddEventHandler('program-casino:putStockItems', function(itemName, count)
+
+  local _source = source
+  local xPlayer = ESX.GetPlayerFromId(_source)
+
+  TriggerEvent('esx_addoninventory:getSharedInventory', 'society_casino', function(inventory)
+
+    local item = inventory.getItem(itemName)
+    local playerItemCount = xPlayer.getInventoryItem(itemName).count
+
+    if item.count >= 0 and count <= playerItemCount then
+      xPlayer.removeInventoryItem(itemName, count)
+      inventory.addItem(itemName, count)
+    else
+      TriggerClientEvent('esx:showNotification', xPlayer.source, "")
+    end
+
+    TriggerClientEvent('esx:showNotification', xPlayer.source, "Dodales " .. count .. ' ' .. item.label)
+
+  end)
+
+end)
+
+RegisterServerEvent('program-casino:getStockItem')
+AddEventHandler('program-casino:getStockItem', function(itemName, count)
+
+  local _source = source
+  local xPlayer = ESX.GetPlayerFromId(_source)
+
+  TriggerEvent('esx_addoninventory:getSharedInventory', 'society_casino', function(inventory)
+
+    local item = inventory.getItem(itemName)
+
+    if item.count >= count then
+      inventory.removeItem(itemName, count)
+      xPlayer.addInventoryItem(itemName, count)
+      TriggerClientEvent('esx:showNotification', xPlayer.source, "Zabrales z szafy " .. count .. 'x ' .. item.label)
+    else
+      TriggerClientEvent('esx:showNotification', xPlayer.source, "Zla ilosc")
+    end
+
+    
+
+  end)
+
+end)

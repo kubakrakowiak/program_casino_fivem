@@ -9,6 +9,8 @@ local Keys = {
     ["LEFT"] = 174, ["RIGHT"] = 175, ["TOP"] = 27, ["DOWN"] = 173,
     ["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
+
+local closeStock = false
 local PlayerData = {}
 local playerPed = PlayerPedId()
 local HasAlreadyEnteredMarker = false
@@ -55,23 +57,29 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
-			if IsControlJustReleased(0, Keys['F6']) and not isDead and not ESX.UI.Menu.IsOpen('default', GetCurrentResourceName(), 'casino_actions') and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
-				OpenCasinoActionsMenu()
-			end
-			if CurrentAction then
-				ESX.ShowHelpNotification(CurrentActionMsg)
-				if IsControlJustReleased(0, Keys['E']) and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
-					if CurrentAction == 'casino_mgmt' then
-						OpenCasinoActionsMenu()
-					elseif CurrentAction == 'CasinoCloak' then
-						OpenCasinoCloak()
-					elseif CurrentAction == 'CasinoBar' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
-						OpenBarMenu()
-					elseif CurrentAction == 'CasinoFridge' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
-						OpenGetFridgeStocksMenu()
-					end
+		if IsControlJustReleased(0, Keys['F6']) and not isDead and not ESX.UI.Menu.IsOpen('default', GetCurrentResourceName(), 'casino_actions') and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+			closeStock = false
+			OpenCasinoActionsMenu()
+		end
+		if CurrentAction then
+			ESX.ShowHelpNotification(CurrentActionMsg)
+			if IsControlJustReleased(0, Keys['E']) and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+				if CurrentAction == 'casino_mgmt' then
+					closeStock = true
+					OpenCasinoActionsMenu()
+				elseif CurrentAction == 'CasinoCloak' then
+					OpenCasinoCloak()
+				elseif CurrentAction == 'CasinoBar' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+					OpenBarMenu()
+				elseif CurrentAction == 'CasinoBar2' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+					OpenBarMenu()
+				elseif CurrentAction == 'CasinoFridge' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+					OpenGetFridgeStocksMenu()
+				elseif CurrentAction == 'CasinoFridge2' and PlayerData.job ~= nil and PlayerData.job.name == 'casino' then
+					OpenGetFridgeStocksMenu()
 				end
 			end
+		end
 	end
 end)
 
@@ -155,7 +163,7 @@ end)
 
 	-------------------------------------------------------Poczatek TP
 positions = {
-    {{930.11, 41.24, 80.7, 0}, {907.26, -942.96, 44.2, 0}},} --
+    {{927.84, 44.43, 80.00, 0}, {1090.00, 207.00, -49.9, 0}},} --
 	local player = GetPlayerPed(-1)
 Citizen.CreateThread(function ()
 	while true do
@@ -177,8 +185,8 @@ Citizen.CreateThread(function ()
 				heading=location[2][4]
 			}
 
-			DrawMarker(29, loc1.x, loc1.y, loc1.z+0.5, 0, 0, 0, 0, 0, 0, 1.501, 1.5001, 1.5001, 0, 0, 255, 200, 1, 1, 0, 0)
-			DrawMarker(29, loc2.x, loc2.y, loc2.z+0.5, 0, 0, 0, 0, 0, 0, 1.501, 1.5001, 1.5001, 0, 0, 255, 200, 1, 1, 0, 0)
+			DrawMarker(1, loc1.x, loc1.y, loc1.z, 0, 0, 0, 0, 0, 0, 1.501, 1.5001, 0.5001, 36,237,157, 200, 0, 0, 0, 0)
+			DrawMarker(1, loc2.x, loc2.y, loc2.z, 0, 0, 0, 0, 0, 0, 1.501, 1.5001, 0.5001, 36,237,157, 200, 0, 0, 0, 0)
 
 			if CheckPos(playerLoc.x, playerLoc.y, playerLoc.z, loc1.x, loc1.y, loc1.z, 2) then
 				alert("Wejdź do centrum kasyna")
@@ -361,6 +369,14 @@ AddEventHandler('program-casino:hasEnteredMarker', function(zone)
 		CurrentAction     = 'CasinoBar'
 		CurrentActionMsg  = "~r~[E] ~p~Bar"
 		CurrentActionData = {}
+	elseif zone == "CasinoBar2" then
+		CurrentAction     = 'CasinoBar2'
+		CurrentActionMsg  = "~r~[E] ~p~Bar"
+		CurrentActionData = {}
+	elseif zone == "CasinoFridge2" then
+		CurrentAction     = 'CasinoFridge2'
+		CurrentActionMsg  = "~r~[E] ~p~Bar"
+		CurrentActionData = {}
 	end
 end)
 
@@ -445,9 +461,13 @@ function OpenCasinoActionsMenu()
 	local elements = {
 		{label = "Popros o bilet",  value = 'ticket'}
 	}
+	if closeStock == true then
+		table.insert(elements, {label = "Szafa Zbrojenia", value = 'weaponArmory'})
+	end
 	if PlayerData.job.grade_name == 'boss' then
 	 	table.insert(elements, {label = "Akcje szefa", value = 'boss_actions'})
 	end
+
 
 	ESX.UI.Menu.CloseAll()
 
@@ -468,6 +488,8 @@ function OpenCasinoActionsMenu()
 			TriggerEvent('esx_society:openBossMenu', 'casino', function (data, menu)
 				menu.close()
 			end, {wash = true})
+		elseif data.current.value == 'weaponArmory' then
+			OpenVaultMenu()
 		end
 
 	end, function(data, menu)
@@ -550,7 +572,7 @@ function OpenGetFridgeStocksMenu()
 			  else
 				menu2.close()
 				menu.close()
-				OpenGetStocksMenu()
+				OpenGetFridgeStocksMenu()
   
 				TriggerServerEvent('program-casino:getFridgeStockItem', itemName, count)
 			  end
@@ -620,62 +642,7 @@ AddEventHandler('esx:setJob', function(job)
 	Citizen.Wait(5000)
 end)
 
-function OpenGetStocksMenu()
 
-	ESX.TriggerServerCallback('esx_unicornjob:getStockItems', function(items)
-  
-	  print(json.encode(items))
-  
-	  local elements = {}
-  
-	  for i=1, #items, 1 do
-		table.insert(elements, {label = 'x' .. items[i].count .. ' ' .. items[i].label, value = items[i].name})
-	  end
-  
-	  ESX.UI.Menu.Open(
-		'default', GetCurrentResourceName(), 'stocks_menu',
-		{
-		  title    = "Casino",
-		  elements = elements
-		},
-		function(data, menu)
-  
-		  local itemName = data.current.value
-  
-		  ESX.UI.Menu.Open(
-			'dialog', GetCurrentResourceName(), 'stocks_menu_get_item_count',
-			{
-			  title = _U('quantity')
-			},
-			function(data2, menu2)
-  
-			  local count = tonumber(data2.value)
-  
-			  if count == nil then
-				ESX.ShowNotification(_U('invalid_quantity'))
-			  else
-				menu2.close()
-				menu.close()
-				OpenGetStocksMenu()
-  
-				TriggerServerEvent('program-casino:getStockItem', itemName, count)
-			  end
-  
-			end,
-			function(data2, menu2)
-			  menu2.close()
-			end
-		  )
-  
-		end,
-		function(data, menu)
-		  menu.close()
-		end
-	  )
-  
-	end)
-  
-end
 
 
 function OpenGetStocksMenu()
@@ -734,3 +701,198 @@ function OpenGetStocksMenu()
 	end)
   
   end
+
+
+function OpenVaultMenu()
+
+
+  
+	local elements = {
+		{label = "Weź Broń", value = 'get_weapon'},
+		{label = "Odstaw Broń", value = 'put_weapon'},
+		{label = "Weź przedmioty", value = 'get_stock'},
+		{label = "Odstaw przedmioty", value = 'put_stock'}
+	}
+	  
+  
+	ESX.UI.Menu.CloseAll()
+  
+	ESX.UI.Menu.Open(
+		'default', GetCurrentResourceName(), 'vault',
+		{
+		  title    = "Krypta",
+		  align    = 'top-left',
+		  elements = elements,
+		},
+		function(data, menu)
+  
+		  if data.current.value == 'get_weapon' then
+			OpenGetWeaponMenu()
+		  end
+  
+		  if data.current.value == 'put_weapon' then
+			OpenPutWeaponMenu()
+		  end
+  
+		  if data.current.value == 'put_stock' then
+		 	 OpenPutStocksMenu()
+		  end
+  
+		  if data.current.value == 'get_stock' then
+		 	 OpenGetStocksMenu()
+		  end
+  
+		end,
+		
+	function(data, menu)
+  
+		menu.close()
+  
+		CurrentAction     = 'menu_vault'
+		CurrentActionMsg  = ""
+		CurrentActionData = {}
+	end
+	)
+  
+end
+
+function OpenGetWeaponMenu()
+
+	ESX.TriggerServerCallback('program-casino:getVaultWeapons', function(weapons)
+  
+	  local elements = {}
+  
+	  for i=1, #weapons, 1 do
+		if weapons[i].count > 0 then
+		  table.insert(elements, {label = 'x' .. weapons[i].count .. ' ' .. ESX.GetWeaponLabel(weapons[i].name), value = weapons[i].name})
+		end
+	  end
+  
+	  ESX.UI.Menu.Open(
+		'default', GetCurrentResourceName(), 'vault_get_weapon',
+		{
+		  title    = "Weź broń",
+		  align    = 'top-left',
+		  elements = elements,
+		},
+		function(data, menu)
+  
+		  menu.close()
+  
+		  ESX.TriggerServerCallback('program-casino:removeVaultWeapon', function()
+			OpenGetWeaponMenu()
+		  end, data.current.value)
+  
+		end,
+		function(data, menu)
+		  menu.close()
+		end
+	  )
+  
+	end)
+  
+end
+
+function OpenPutWeaponMenu()
+
+	local elements   = {}
+	local playerPed  = GetPlayerPed(-1)
+	local weaponList = ESX.GetWeaponList()
+  
+	for i=1, #weaponList, 1 do
+  
+	  local weaponHash = GetHashKey(weaponList[i].name)
+  
+	  if HasPedGotWeapon(playerPed,  weaponHash,  false) and weaponList[i].name ~= 'WEAPON_UNARMED' then
+		local ammo = GetAmmoInPedWeapon(playerPed, weaponHash)
+		table.insert(elements, {label = weaponList[i].label, value = weaponList[i].name})
+	  end
+  
+	end
+  
+	ESX.UI.Menu.Open(
+	  'default', GetCurrentResourceName(), 'vault_put_weapon',
+	  {
+		title    = "Włóż broń",
+		align    = 'top-left',
+		elements = elements,
+	  },
+	  function(data, menu)
+  
+		menu.close()
+  
+		ESX.TriggerServerCallback('program-casino:addVaultWeapon', function()
+		  OpenPutWeaponMenu()
+		end, data.current.value)
+  
+	  end,
+	  function(data, menu)
+		menu.close()
+	  end
+	)
+  
+end
+
+  
+function OpenPutStocksMenu()
+
+	ESX.TriggerServerCallback('program-casino:getPlayerInventory', function(inventory)
+	
+		local elements = {}
+	
+		for i=1, #inventory.items, 1 do
+	
+		  local item = inventory.items[i]
+	
+		  if item.count > 0 then
+			table.insert(elements, {label = item.label .. ' x' .. item.count, type = 'item_standard', value = item.name})
+		  end
+	
+		end
+	
+		ESX.UI.Menu.Open(
+		  'default', GetCurrentResourceName(), 'stocks_menu',
+		  {
+			title    = "Ekwipunek",
+			elements = elements
+		  },
+		  function(data, menu)
+	
+			local itemName = data.current.value
+	
+			ESX.UI.Menu.Open(
+			  'dialog', GetCurrentResourceName(), 'stocks_menu_put_item_count',
+			  {
+				title = "Ilość"
+			  },
+			  function(data2, menu2)
+	
+				local count = tonumber(data2.value)
+	
+				if count == nil then
+				  ESX.ShowNotification("Zła ilość")
+				else
+				  menu2.close()
+				  menu.close()
+				  OpenPutStocksMenu()
+	
+				  TriggerServerEvent('program-casino:putStockItems', itemName, count)
+				end
+	
+			  end,
+			  function(data2, menu2)
+				menu2.close()
+			  end
+			)
+	
+		  end,
+		  function(data, menu)
+			menu.close()
+		  end
+		)
+	
+	  end)
+	
+end
+
+
