@@ -1,14 +1,3 @@
-local Keys = {
-    ["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
-    ["~"] = 243, ["1"] = 157, ["2"] = 158, ["3"] = 160, ["4"] = 164, ["5"] = 165, ["6"] = 159, ["7"] = 161, ["8"] = 162, ["9"] = 163, ["-"] = 84, ["="] = 83, ["BACKSPACE"] = 177,
-    ["TAB"] = 37, ["Q"] = 44, ["W"] = 32, ["E"] = 38, ["R"] = 45, ["T"] = 245, ["Y"] = 246, ["U"] = 303, ["P"] = 199, ["["] = 39, ["]"] = 40, ["ENTER"] = 18,
-    ["CAPS"] = 137, ["A"] = 34, ["S"] = 8, ["D"] = 9, ["F"] = 23, ["G"] = 47, ["H"] = 74, ["K"] = 311, ["L"] = 182,
-    ["LEFTSHIFT"] = 21, ["Z"] = 20, ["X"] = 73, ["C"] = 26, ["V"] = 0, ["B"] = 29, ["N"] = 249, ["M"] = 244, [","] = 82, ["."] = 81,
-    ["LEFTCTRL"] = 36, ["LEFTALT"] = 19, ["SPACE"] = 22, ["RIGHTCTRL"] = 70,
-    ["HOME"] = 213, ["PAGEUP"] = 10, ["PAGEDOWN"] = 11, ["DELETE"] = 178,
-    ["LEFT"] = 174, ["RIGHT"] = 175, ["TOP"] = 27, ["DOWN"] = 173,
-    ["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
-}
 local cards = {
 	{'As Kier',11,'http://167.99.90.247/testowy/img/ace_of_hearts.png'},       	{'As Trefl',11,'http://167.99.90.247/testowy/img/ace_of_clubs.png'},
 	{'As Karo',11,'http://167.99.90.247/testowy/img/ace_of_diamonds.png'},     	{'As Pik',11,'http://167.99.90.247/testowy/img/ace_of_spades.png'},
@@ -56,9 +45,7 @@ local isPlatinium = false
 local isP2playing = false
 local isP1playing = false
 
-
 ESX = nil
-
 
 Citizen.CreateThread(function()
 	while ESX == nil do
@@ -71,17 +58,14 @@ Citizen.CreateThread(function()
 	end
 
 	PlayerData = ESX.GetPlayerData()
-
 end)
-
-
 
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 		if CurrentAction then
 			ESX.ShowHelpNotification(CurrentActionMsg)
-			if IsControlJustReleased(0, Keys['E']) and PlayerData.job ~= nil  then
+			if IsControlJustReleased(0, 38) and PlayerData.job ~= nil  then
 				if CurrentAction == 'Croupier' then
 					Croupier()
 				elseif CurrentAction == 'Player1' and isP1playing == false then
@@ -93,7 +77,6 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-
 
 Citizen.CreateThread(function()
 	while true do
@@ -121,11 +104,9 @@ Citizen.CreateThread(function()
 				HasAlreadyEnteredMarker = false
 				TriggerEvent('program-casino:hasExitedMarker', LastZone)
 			end
-
 		end
 	end
 end)
-
 
 --Show markers
 Citizen.CreateThread(function()
@@ -150,8 +131,6 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-
-
 
 AddEventHandler('program-casino:hasEnteredMarker', function(zone)
 	if zone =='Croupier' then
@@ -181,8 +160,7 @@ AddEventHandler('program-casino:hasExitedMarker', function(zone)
 	ESX.UI.Menu.CloseAll()
 end)
 
-
-	-------------------------------------------------------Koniec TP
+-------------------------------------------------------Koniec TP
 AddEventHandler('esx:onPlayerDeath', function(data)
 	isDead = true
 end)
@@ -218,8 +196,6 @@ AddEventHandler('program-blackjack:isPlatiniumSetFalse', function()
 	print("el2o")
 	isPlatinium=false
 end)
-
-
 
 RegisterNetEvent('program-blackjack:givecards')
 AddEventHandler('program-blackjack:givecards', function()
@@ -287,9 +263,6 @@ AddEventHandler('program-blackjack:givecards', function()
 	end
 end)
 
-
-
-
 function Croupier()
 	if gameInProgress == false and PlayerData.job.name == 'casino' then
 		ESX.UI.Menu.Open(
@@ -318,17 +291,14 @@ function Croupier()
 					ESX.UI.Menu.CloseAll()
 					end)
 				end
-			end,
-			function(data2,menu)
+			end, function(data2,menu)
 			menu.close()
-			end
-		)
+			end)
 	elseif PlayerData.job.name ~= 'casino' then
 		ESX.ShowNotification("Musisz być krupierem aby otworzyć stół")
 	elseif gameInProgress == true and PlayerData.job.name == 'casino' then
 		ESX.ShowNotification("~b~Aktualnie trwa rozgrywka, aby rozpoczac nowa zakończ tą zdalnie ~r~[X]~b~ lub poczekaj do konca")
 	end
-	
 end
 
 function Player1()
@@ -341,9 +311,9 @@ function Player1()
 					{label = "Zagraj nieopodatkowaną",  value = 'black'},
 					{label = "Zagraj opodatkowaną",  value = 'money'}
 				}
-			
+
 				ESX.UI.Menu.CloseAll()
-			
+
 				ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'wybierz_walute', {
 					title    = "Casino",
 					align    = 'top-left',
@@ -461,9 +431,6 @@ function Player2()
 	end)
 end
 
-
-
-
 function GameInProgress()
 	FreezeEntityPosition(GetPlayerPed(-1), true)
 	gameInProgress = true
@@ -476,7 +443,6 @@ function GameInProgress()
 		end
 	end
 end
-
 
 function CheckPos(x, y, z, cx, cy, cz, radius)
 	local t1 = x - cx
@@ -496,4 +462,3 @@ function alert(msg)
 	AddTextComponentString(msg)
 	DisplayHelpTextFromStringLabel(0,0,1,-1)
 end
-
