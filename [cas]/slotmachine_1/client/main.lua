@@ -1,8 +1,5 @@
-local input = {["E"] = 38,["DOWN"] = 173,["TOP"] = 27,["NENTER"] =  201}
-ESX                           = nil
-local PlayerData                = {}
-
-
+ESX = nil
+local PlayerData = {}
 
 Citizen.CreateThread(function()
   while ESX == nil do
@@ -21,17 +18,14 @@ AddEventHandler('esx:setJob', function(job)
 	PlayerData.job = job
 end)
 
-
 Citizen.CreateThread(function()
 SetNuiFocus(false, false)
 end)
-
 
 RegisterNetEvent('errormessage2')
 AddEventHandler('errormessage2', function()
 PlaySound(GetPlayerServerId(GetPlayerPed(-1)), "CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET", 0, 0, 1)
 end)
-
 
 RegisterNetEvent('spinit2')
 AddEventHandler('spinit2', function()
@@ -45,9 +39,7 @@ AddEventHandler('spinit2', function()
 		SendNUIMessage({
 			canspin = false
 		})
-
 end)
-
 
 RegisterNUICallback('close', function(data, cb)
 
@@ -57,17 +49,12 @@ RegisterNUICallback('close', function(data, cb)
 	})
 	cb("ok")
 	PlaySound(GetPlayerServerId(GetPlayerPed(-1)), "Apt_Style_Purchase", "DLC_APT_Apartment_SoundSet", 0, 0, 1)
-
 end)
-
-
-
 
 RegisterNUICallback('payforplayer', function(winnings, cb)
 	PlaySound(GetPlayerServerId(GetPlayerPed(-1)), "ROBBERY_MONEY_TOTAL", "HUD_FRONTEND_CUSTOM_SOUNDSET", 0, 0, 1)
 	TriggerServerEvent('payforplayer2',winnings)
 end)
-
 
 RegisterNUICallback('playerpays', function(bet, cb)
 	TriggerServerEvent('playerpays2',bet)
@@ -102,8 +89,6 @@ local moneymachine_slot = {
 	{ ['x'] = 940.18, ['y'] = 7.06, ['z'] = 116.16 },
 }
 
-
-
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
@@ -112,8 +97,8 @@ Citizen.CreateThread(function()
 			if(Vdist(v.x, v.y, v.z, pos.x, pos.y, pos.z) < 20.0)then
 				DrawMarker(29, v.x, v.y, v.z + 0.2, 0, 0, 0, 0, 0, 0, 0.6001, 1.0001, 0.6, 0, 255, 5, 90, 1,0, 0,1)
 				if(Vdist(v.x, v.y, v.z, pos.x, pos.y, pos.z) < 1.0)then
-						DisplayHelpText("Wcisnij ~INPUT_CONTEXT~   ~y~aby zagrać w sloty")
-					if IsControlJustPressed(1,input["E"]) then
+						ESX.ShowHelpNotification('Wcisnij ~INPUT_CONTEXT~   ~y~aby zagrać w sloty')
+					if IsControlJustPressed(1, 38) then
 						SendNUIMessage({
 							show = true
 						})
@@ -131,4 +116,3 @@ function DisplayHelpText(str)
 	AddTextComponentString(str)
 	DisplayHelpTextFromStringLabel(0, 0, 1, -1)
 end
-
