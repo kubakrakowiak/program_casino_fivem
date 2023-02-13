@@ -1,4 +1,4 @@
-# Thanks for 's0ig', he have released slotmachine which i edited to make this casino pack
+# Thanks for 's0ig', he have released slotmachine which I've edited to make this casino pack
 
 # program_casino_fivem
 A pack of casino scripts in Lua lang for fivem
